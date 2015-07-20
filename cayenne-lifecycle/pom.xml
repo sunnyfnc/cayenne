@@ -22,7 +22,7 @@
 	<parent>
 		<artifactId>cayenne-parent</artifactId>
 		<groupId>org.apache.cayenne</groupId>
-		<version>4.0.M3-SNAPSHOT</version>
+		<version>4.0.M3</version>
 	</parent>
 	<artifactId>cayenne-lifecycle</artifactId>
 	<name>Cayenne Lifecycle Utilities</name>
@@ -32,7 +32,7 @@
 		<!-- Compile dependencies -->
 		<dependency>
 			<groupId>org.apache.cayenne</groupId>
-			<artifactId>cayenne-server</artifactId>
+			<artifactId>pp-cayenne-server</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

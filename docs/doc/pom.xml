@@ -24,7 +24,7 @@
 	<parent>
 		<groupId>org.apache.cayenne.docs</groupId>
 		<artifactId>cayenne-docs-parent</artifactId>
-		<version>4.0.M3-SNAPSHOT</version>
+		<version>4.0.M3</version>
 	</parent>
 
 	<artifactId>cayenne-doc</artifactId>
@@ -37,7 +37,7 @@
 
 		<dependency>
 			<groupId>org.apache.cayenne</groupId>
-			<artifactId>cayenne-server</artifactId>
+			<artifactId>pp-cayenne-server</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -158,19 +158,19 @@
 							<artifactItems>
 								<artifactItem>
 									<groupId>org.apache.cayenne</groupId>
-									<artifactId>cayenne-di</artifactId>
+									<artifactId>pp-cayenne-di</artifactId>
 									<version>${project.version}</version>
 									<classifier>sources</classifier>
 								</artifactItem>
 								<artifactItem>
 									<groupId>org.apache.cayenne</groupId>
-									<artifactId>cayenne-server</artifactId>
+									<artifactId>pp-cayenne-server</artifactId>
 									<version>${project.version}</version>
 									<classifier>sources</classifier>
 								</artifactItem>
 								<artifactItem>
 									<groupId>org.apache.cayenne</groupId>
-									<artifactId>cayenne-client</artifactId>
+									<artifactId>pp-cayenne-client</artifactId>
 									<version>${project.version}</version>
 									<classifier>sources</classifier>
 								</artifactItem>

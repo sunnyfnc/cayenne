@@ -100,7 +100,7 @@ public class DataContext extends BaseContext {
 
     /**
      * Creates a new DataContext with parent DataChannel and ObjectStore.
-     * 
+     *
      * @since 1.2
      */
     public DataContext(DataChannel channel, ObjectStore objectStore) {
@@ -166,7 +166,7 @@ public class DataContext extends BaseContext {
      * Returns a DataDomain used by this DataContext. DataDomain is looked up in
      * the DataChannel hierarchy. If a channel is not a DataDomain or a
      * DataContext, null is returned.
-     * 
+     *
      * @return DataDomain that is a direct or indirect parent of this
      *         DataContext in the DataChannel hierarchy.
      * @since 1.1
@@ -195,7 +195,7 @@ public class DataContext extends BaseContext {
      * Sets a DataContextDelegate for this context. Delegate is notified of
      * certain events in the DataContext lifecycle and can customize DataContext
      * behavior.
-     * 
+     *
      * @since 1.1
      */
     public void setDelegate(DataContextDelegate delegate) {
@@ -204,7 +204,7 @@ public class DataContext extends BaseContext {
 
     /**
      * Returns a delegate currently associated with this DataContext.
-     * 
+     *
      * @since 1.1
      */
     public DataContextDelegate getDelegate() {
@@ -265,7 +265,7 @@ public class DataContext extends BaseContext {
 
     /**
      * Returns a collection of all uncommitted registered objects.
-     * 
+     *
      * @since 1.2
      */
     @Override
@@ -301,7 +301,7 @@ public class DataContext extends BaseContext {
      * object have temporary ids. DO NOT USE this method if you expect a DataRow
      * to represent a complete object state.
      * </p>
-     * 
+     *
      * @since 1.1
      */
     public DataRow currentSnapshot(final Persistent object) {
@@ -316,14 +316,19 @@ public class DataContext extends BaseContext {
         final ClassDescriptor descriptor = getEntityResolver().getClassDescriptor(entity.getName());
         final DataRow snapshot = new DataRow(10);
 
-        descriptor.visitProperties(new PropertyVisitor() {
+	    final Map<String, Object> thisIdParts = object.getObjectId().getIdSnapshot();
+
+	    descriptor.visitProperties(new PropertyVisitor() {
 
             public boolean visitAttribute(AttributeProperty property) {
                 ObjAttribute objAttr = property.getAttribute();
 
                 // processing compound attributes correctly
-                snapshot.put(objAttr.getDbAttributePath(), property.readPropertyDirectly(object));
-                return true;
+	            String dbAttrPath = objAttr.getDbAttributePath();
+	            if (!thisIdParts.containsKey(dbAttrPath)) {
+		            snapshot.put(dbAttrPath, property.readPropertyDirectly(object));
+	            }
+	            return true;
             }
 
             public boolean visitToMany(ToManyProperty property) {
@@ -386,9 +391,8 @@ public class DataContext extends BaseContext {
         // we should ignore any object id values if a corresponding attribute
         // is a part of relationship "toMasterPK", since those values have been
         // set above when db relationships where processed.
-        Map<String, Object> thisIdParts = object.getObjectId().getIdSnapshot();
-        if (thisIdParts != null) {
 
+        if (thisIdParts != null) {
             // put only those that do not exist in the map
             for (Map.Entry<String, Object> entry : thisIdParts.entrySet()) {
                 String nextKey = entry.getKey();
@@ -404,7 +408,7 @@ public class DataContext extends BaseContext {
     /**
      * Converts a list of DataRows to a List of DataObject registered with this
      * DataContext.
-     * 
+     *
      * @since 3.0
      */
     public List objectsFromDataRows(ClassDescriptor descriptor, List<? extends DataRow> dataRows) {
@@ -427,7 +431,7 @@ public class DataContext extends BaseContext {
 
     /**
      * Creates a DataObject from DataRow.
-     * 
+     *
      * @see DataRow
      * @since 3.1
      */
@@ -446,7 +450,7 @@ public class DataContext extends BaseContext {
     /**
      * Creates a DataObject from DataRow. This variety of the
      * 'objectFromDataRow' method is normally used for generic classes.
-     * 
+     *
      * @see DataRow
      * @since 3.1
      */
@@ -459,7 +463,7 @@ public class DataContext extends BaseContext {
 
     /**
      * Creates and registers a new persistent object.
-     * 
+     *
      * @since 1.2
      */
     @Override
@@ -484,7 +488,7 @@ public class DataContext extends BaseContext {
      * <i>Note: in most cases {@link #newObject(Class)} method should be used,
      * however this method is helpful when generic persistent classes are
      * used.</i>
-     * 
+     *
      * @since 3.0
      */
     public Persistent newObject(String entityName) {
@@ -522,7 +526,7 @@ public class DataContext extends BaseContext {
      * <p>
      * <i>Note that since 3.0 this method takes Object as an argument instead of
      * a {@link DataObject}.</i>
-     * 
+     *
      * @param object
      *            new object that needs to be made persistent.
      */
@@ -616,7 +620,7 @@ public class DataContext extends BaseContext {
      * Unregisters a Collection of DataObjects from the DataContext and the
      * underlying ObjectStore. This operation also unsets DataContext and
      * ObjectId for each object and changes its state to TRANSIENT.
-     * 
+     *
      * @see #invalidateObjects(Collection)
      */
     public void unregisterObjects(Collection dataObjects) {
@@ -627,7 +631,7 @@ public class DataContext extends BaseContext {
      * If the parent channel is a DataContext, reverts local changes to make
      * this context look like the parent, if the parent channel is a DataDomain,
      * reverts all changes.
-     * 
+     *
      * @since 1.2
      */
     @Override
@@ -675,7 +679,7 @@ public class DataContext extends BaseContext {
      * common case), the changes are written to the database. To cause cascading
      * commit all the way to the database, one must use {@link #commitChanges()}
      * .
-     * 
+     *
      * @since 1.2
      * @see #commitChanges()
      */
@@ -715,7 +719,7 @@ public class DataContext extends BaseContext {
 
     /**
      * Synchronizes with the parent channel, performing a flush or a commit.
-     * 
+     *
      * @since 1.2
      */
     GraphDiff flushToParent(boolean cascade) {
@@ -926,7 +930,7 @@ public class DataContext extends BaseContext {
 
     /**
      * Executes a query returning a generic response.
-     * 
+     *
      * @since 1.2
      */
     @Override
@@ -959,7 +963,7 @@ public class DataContext extends BaseContext {
      * <p>
      * <i>Since 1.2 takes any Query parameter, not just GenericSelectQuery</i>
      * </p>
-     * 
+     *
      * @return A list of DataObjects or a DataRows, depending on the value
      *         returned by {@link QueryMetadata#isFetchingDataRows()}.
      */
@@ -978,7 +982,7 @@ public class DataContext extends BaseContext {
     /**
      * An implementation of a {@link DataChannel} method that is used by child
      * contexts to execute queries. Not intended for direct use.
-     * 
+     *
      * @since 1.2
      */
     public QueryResponse onQuery(ObjectContext context, Query query) {
@@ -988,7 +992,7 @@ public class DataContext extends BaseContext {
     /**
      * Performs a single database query that does not select rows. Returns an
      * array of update counts.
-     * 
+     *
      * @since 1.1
      */
     public int[] performNonSelectingQuery(Query query) {
@@ -999,7 +1003,7 @@ public class DataContext extends BaseContext {
     /**
      * Performs a named mapped query that does not select rows. Returns an array
      * of update counts.
-     * 
+     *
      * @since 1.1
      */
     public int[] performNonSelectingQuery(String queryName) {
@@ -1009,7 +1013,7 @@ public class DataContext extends BaseContext {
     /**
      * Performs a named mapped non-selecting query using a map of parameters.
      * Returns an array of update counts.
-     * 
+     *
      * @since 1.1
      */
     public int[] performNonSelectingQuery(String queryName, Map<String, ?> parameters) {
@@ -1021,7 +1025,7 @@ public class DataContext extends BaseContext {
      * the DataMaps. Internally Cayenne uses a caching policy defined in the
      * named query. If refresh flag is true, a refresh is forced no matter what
      * the caching policy is.
-     * 
+     *
      * @param queryName
      *            a name of a GenericSelectQuery defined in one of the DataMaps.
      *            If no such query is defined, this method will throw a
@@ -1040,7 +1044,7 @@ public class DataContext extends BaseContext {
      * the DataMaps. Internally Cayenne uses a caching policy defined in the
      * named query. If refresh flag is true, a refresh is forced no matter what
      * the caching policy is.
-     * 
+     *
      * @param queryName
      *            a name of a GenericSelectQuery defined in one of the DataMaps.
      *            If no such query is defined, this method will throw a
@@ -1061,7 +1065,7 @@ public class DataContext extends BaseContext {
     /**
      * Returns <code>true</code> if the ObjectStore uses shared cache of a
      * parent DataDomain.
-     * 
+     *
      * @since 1.1
      */
     public boolean isUsingSharedSnapshotCache() {
@@ -1129,7 +1133,7 @@ public class DataContext extends BaseContext {
 
     /**
      * Returns this context's ObjectStore.
-     * 
+     *
      * @since 1.2
      */
     @Override
@@ -1141,7 +1145,7 @@ public class DataContext extends BaseContext {
      * An internal version of {@link #localObject(Object)} that operates on
      * ObjectId instead of Persistent, and wouldn't attempt to look up an object
      * in the parent channel.
-     * 
+     *
      * @since 3.1
      */
     Persistent findOrCreateObject(ObjectId id) {

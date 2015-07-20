@@ -14,9 +14,9 @@
 	<parent>
 		<groupId>org.apache.cayenne</groupId>
 		<artifactId>cayenne-parent</artifactId>
-		<version>4.0.M3-SNAPSHOT</version>
+		<version>4.0.M3</version>
 	</parent>
-	<artifactId>cayenne-di</artifactId>
+	<artifactId>pp-cayenne-di</artifactId>
 	<packaging>jar</packaging>
 	<name>Cayenne Dependency Injection Container</name>
 	<description>Cayenne Dependency Injection Container</description>

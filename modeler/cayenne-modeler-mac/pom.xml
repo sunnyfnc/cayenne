@@ -24,7 +24,7 @@
 	<parent>
 		<groupId>org.apache.cayenne.modeler</groupId>
 		<artifactId>cayenne-modeler-parent</artifactId>
-		<version>4.0.M3-SNAPSHOT</version>
+		<version>4.0.M3</version>
 	</parent>
 
 	<artifactId>cayenne-modeler-mac</artifactId>
@@ -51,12 +51,12 @@
 		-->
 		<dependency>
 			<groupId>org.apache.cayenne</groupId>
-			<artifactId>cayenne-server</artifactId>
+			<artifactId>pp-cayenne-server</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.cayenne</groupId>
-			<artifactId>cayenne-project</artifactId>
+			<artifactId>pp-cayenne-project</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

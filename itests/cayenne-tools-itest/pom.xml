@@ -21,7 +21,7 @@
 	<parent>
 		<groupId>org.apache.cayenne.itests</groupId>
 		<artifactId>cayenne-itests-parent</artifactId>
-		<version>4.0.M3-SNAPSHOT</version>
+		<version>4.0.M3</version>
 	</parent>
 
 	<description>Integration Tests - Cayenne Tools</description>
@@ -50,19 +50,19 @@
 
 		<dependency>
 			<groupId>org.apache.cayenne</groupId>
-			<artifactId>cayenne-di</artifactId>
+			<artifactId>pp-cayenne-di</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.cayenne</groupId>
-			<artifactId>cayenne-server</artifactId>
+			<artifactId>pp-cayenne-server</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.cayenne</groupId>
-			<artifactId>cayenne-tools</artifactId>
+			<artifactId>pp-cayenne-tools</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

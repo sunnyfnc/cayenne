@@ -22,9 +22,9 @@
 	<parent>
 		<groupId>org.apache.cayenne</groupId>
 		<artifactId>cayenne-parent</artifactId>
-		<version>4.0.M3-SNAPSHOT</version>
+		<version>4.0.M3</version>
 	</parent>
-	<artifactId>cayenne-server</artifactId>
+	<artifactId>pp-cayenne-server</artifactId>
 	<name>Cayenne Server</name>
 	<description>Cayenne Server</description>
 	<packaging>jar</packaging>
@@ -34,7 +34,7 @@
 		<!-- Compile dependencies -->
 		<dependency>
 			<groupId>org.apache.cayenne</groupId>
-			<artifactId>cayenne-di</artifactId>
+			<artifactId>pp-cayenne-di</artifactId>
 			<version>${project.version}</version>
 			<scope>compile</scope>
 		</dependency>
