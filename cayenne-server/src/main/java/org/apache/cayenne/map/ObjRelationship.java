@@ -19,12 +19,6 @@
 
 package org.apache.cayenne.map;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.configuration.ConfigurationNodeVisitor;
@@ -35,6 +29,8 @@ import org.apache.cayenne.util.ToStringBuilder;
 import org.apache.cayenne.util.Util;
 import org.apache.cayenne.util.XMLEncoder;
 
+import java.util.*;
+
 /**
  * Describes an association between two Java classes mapped as source and target
  * ObjEntity. Maps to a path of DbRelationships.
@@ -44,7 +40,7 @@ public class ObjRelationship extends Relationship implements ConfigurationNode {
     /**
      * Denotes a default type of to-many relationship collection which is a Java
      * List.
-     * 
+     *
      * @since 3.0
      */
     public static final String DEFAULT_COLLECTION_TYPE = "java.util.List";
@@ -65,7 +61,7 @@ public class ObjRelationship extends Relationship implements ConfigurationNode {
     /**
      * Stores the type of collection mapped by a to-many relationship. Null for
      * to-one relationships.
-     * 
+     *
      * @since 3.0
      */
     protected String collectionType;
@@ -74,7 +70,7 @@ public class ObjRelationship extends Relationship implements ConfigurationNode {
      * Stores a property name of a target entity used to create a relationship
      * map. Only has effect if collectionType property is set to
      * "java.util.Map".
-     * 
+     *
      * @since 3.0
      */
     protected String mapKey;
@@ -101,7 +97,7 @@ public class ObjRelationship extends Relationship implements ConfigurationNode {
 
     /**
      * Prints itself as XML to the provided XMLEncoder.
-     * 
+     *
      * @since 1.1
      */
     public void encodeAsXML(XMLEncoder encoder) {
@@ -168,7 +164,7 @@ public class ObjRelationship extends Relationship implements ConfigurationNode {
     /**
      * Returns the name of a complimentary relationship going in the opposite
      * direction or null if it doesn't exist.
-     * 
+     *
      * @since 1.2
      */
     public String getReverseRelationshipName() {
@@ -237,7 +233,7 @@ public class ObjRelationship extends Relationship implements ConfigurationNode {
      * already exists. Returned relationship is not attached to the source
      * entity and has no name. Throws a {@link CayenneRuntimeException} if
      * reverse DbRelationship is not mapped.
-     * 
+     *
      * @since 3.0
      */
     public ObjRelationship createReverseRelationship() {
@@ -308,7 +304,7 @@ public class ObjRelationship extends Relationship implements ConfigurationNode {
      * key(s) will not guarantee a presence of a target record. PK..FK
      * relationships are all optional, but there are other more subtle cases,
      * such as PK..PK, etc.
-     * 
+     *
      * @since 3.0
      */
     public boolean isOptional() {
@@ -343,7 +339,7 @@ public class ObjRelationship extends Relationship implements ConfigurationNode {
     /**
      * Returns true if the relationship is non-optional and target has no
      * subclasses.
-     * 
+     *
      * @since 3.0
      */
     public boolean isSourceDefiningTargetPrecenseAndType(EntityResolver entityResolver) {
@@ -378,7 +374,7 @@ public class ObjRelationship extends Relationship implements ConfigurationNode {
      * Returns a boolean indicating whether modifying a target of such
      * relationship in any way will not change the underlying table row of the
      * source.
-     * 
+     *
      * @since 1.1
      */
     public boolean isSourceIndependentFromTargetChange() {
@@ -397,7 +393,7 @@ public class ObjRelationship extends Relationship implements ConfigurationNode {
     /**
      * Returns true if the underlying DbRelationships point to a at least one of
      * the columns of the target entity.
-     * 
+     *
      * @since 1.1
      */
     public boolean isToPK() {
@@ -411,7 +407,7 @@ public class ObjRelationship extends Relationship implements ConfigurationNode {
      * "relationship path". All flattened relationships are at least readable,
      * but only those formed across a many-many join table (with no custom
      * attributes other than foreign keys) can be automatically written.
-     * 
+     *
      * @see #isReadOnly
      * @return flag indicating if the relationship is flattened or not.
      */
@@ -422,7 +418,7 @@ public class ObjRelationship extends Relationship implements ConfigurationNode {
     /**
      * Returns true if the relationship is flattened, but is not of the single
      * case that can have automatic write support. Otherwise, it returns false.
-     * 
+     *
      * @return flag indicating if the relationship is read only or not
      */
     public boolean isReadOnly() {
@@ -442,7 +438,7 @@ public class ObjRelationship extends Relationship implements ConfigurationNode {
      * Returns the deleteRule. The delete rule is a constant from the DeleteRule
      * class, and specifies what should happen to the destination object when
      * the source object is deleted.
-     * 
+     *
      * @return int a constant from DeleteRule
      * @see #setDeleteRule
      */
@@ -452,7 +448,7 @@ public class ObjRelationship extends Relationship implements ConfigurationNode {
 
     /**
      * Sets the delete rule of the relationship.
-     * 
+     *
      * @param value
      *            New delete rule. Must be one of the constants defined in
      *            DeleteRule class.
@@ -473,7 +469,7 @@ public class ObjRelationship extends Relationship implements ConfigurationNode {
 
     /**
      * Returns whether this attribute should be used for locking.
-     * 
+     *
      * @since 1.1
      */
     public boolean isUsedForLocking() {
@@ -482,7 +478,7 @@ public class ObjRelationship extends Relationship implements ConfigurationNode {
 
     /**
      * Sets whether this attribute should be used for locking.
-     * 
+     *
      * @since 1.1
      */
     public void setUsedForLocking(boolean usedForLocking) {
@@ -491,7 +487,7 @@ public class ObjRelationship extends Relationship implements ConfigurationNode {
 
     /**
      * Returns a dot-separated path over mapped DbRelationships.
-     * 
+     *
      * @since 1.1
      */
     public String getDbRelationshipPath() {
@@ -517,7 +513,7 @@ public class ObjRelationship extends Relationship implements ConfigurationNode {
 
     /**
      * Returns a reversed dbRelationship path.
-     * 
+     *
      * @since 1.2
      */
     public String getReverseDbRelationshipPath() throws ExpressionException {
@@ -564,7 +560,7 @@ public class ObjRelationship extends Relationship implements ConfigurationNode {
      * Sets relationship path, but does not trigger its conversion to
      * List<DbRelationship> For internal purposes, primarily datamap loading
      */
-    void setDeferredDbRelationshipPath(String relationshipPath) {
+    protected void setDeferredDbRelationshipPath(String relationshipPath) {
         if (!Util.nullSafeEquals(getDbRelationshipPath(), relationshipPath)) {
             deferredPath = relationshipPath;
         }
@@ -575,10 +571,10 @@ public class ObjRelationship extends Relationship implements ConfigurationNode {
      */
     void refreshFromDeferredPath() {
         if (deferredPath != null) {
-            
+
             synchronized(this) {
-                
-                // check if another thread just 
+
+                // check if another thread just
                 // loaded path from deferredPath
                 if (deferredPath != null){
                     refreshFromPath(deferredPath, true);
@@ -733,7 +729,7 @@ public class ObjRelationship extends Relationship implements ConfigurationNode {
     /**
      * Returns an ObjAttribute stripped of any server-side information, such as
      * DbAttribute mapping.
-     * 
+     *
      * @since 1.2
      */
     public ObjRelationship getClientRelationship() {
@@ -756,7 +752,7 @@ public class ObjRelationship extends Relationship implements ConfigurationNode {
      * Returns null for to-one relationships. Default for to-many is
      * "java.util.List". Other possible values are "java.util.Set",
      * "java.util.Collection", "java.util.Map".
-     * 
+     *
      * @since 3.0
      */
     public String getCollectionType() {
@@ -778,7 +774,7 @@ public class ObjRelationship extends Relationship implements ConfigurationNode {
      * Returns a property name of a target entity used to create a relationship
      * map. Only has effect if collectionType property is set to
      * "java.util.Map".
-     * 
+     *
      * @return The attribute name used for the map key or <code>null</code> if
      *         the default (PK) is used as the map key.
      * @since 3.0

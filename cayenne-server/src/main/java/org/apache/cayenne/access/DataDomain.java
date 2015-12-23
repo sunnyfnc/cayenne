@@ -19,22 +19,7 @@
 
 package org.apache.cayenne.access;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import org.apache.cayenne.CayenneRuntimeException;
-import org.apache.cayenne.DataChannel;
-import org.apache.cayenne.DataChannelFilter;
-import org.apache.cayenne.DataChannelFilterChain;
-import org.apache.cayenne.DataChannelSyncCallbackAction;
-import org.apache.cayenne.ObjectContext;
-import org.apache.cayenne.QueryResponse;
+import org.apache.cayenne.*;
 import org.apache.cayenne.cache.QueryCache;
 import org.apache.cayenne.configuration.Constants;
 import org.apache.cayenne.di.BeforeScopeEnd;
@@ -53,6 +38,10 @@ import org.apache.cayenne.tx.Transaction;
 import org.apache.cayenne.tx.TransactionManager;
 import org.apache.cayenne.tx.TransactionalOperation;
 import org.apache.cayenne.util.ToStringBuilder;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * DataDomain performs query routing functions in Cayenne. DataDomain creates
@@ -811,4 +800,8 @@ public class DataDomain implements QueryEngine, DataChannel {
     TransactionManager getTransactionManager() {
         return transactionManager;
     }
+
+	public boolean isStopped() {
+		return stopped;
+	}
 }

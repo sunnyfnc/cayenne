@@ -19,14 +19,6 @@
 
 package org.apache.cayenne.access.jdbc;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Collection;
-import java.util.Collections;
-
 import org.apache.cayenne.CayenneException;
 import org.apache.cayenne.ResultIterator;
 import org.apache.cayenne.access.DataNode;
@@ -44,6 +36,10 @@ import org.apache.cayenne.query.BatchQuery;
 import org.apache.cayenne.query.BatchQueryRow;
 import org.apache.cayenne.query.InsertBatchQuery;
 
+import java.sql.*;
+import java.util.Collection;
+import java.util.Collections;
+
 /**
  * @since 1.2
  */
@@ -52,16 +48,17 @@ public class BatchAction extends BaseSQLAction {
     protected boolean runningAsBatch;
     protected BatchQuery query;
     protected RowDescriptor keyRowDescriptor;
+	private static final int MAX_BATCH_SIZE = 1000;
 
-    private static void bind(DbAdapter adapter, PreparedStatement statement, ParameterBinding[] bindings)
-            throws SQLException, Exception {
+	private static void bind(DbAdapter adapter, PreparedStatement statement, ParameterBinding[] bindings)
+			throws SQLException, Exception {
 
-        for (ParameterBinding b : bindings) {
-            if (!b.isExcluded()) {
-                adapter.bindParameter(statement, b.getValue(), b.getStatementPosition(), b.getAttribute().getType(), b
-                        .getAttribute().getScale());
-            }
-        }
+		for (ParameterBinding b : bindings) {
+			if (!b.isExcluded()) {
+				adapter.bindParameter(statement, b.getValue(), b.getStatementPosition(), b.getAttribute().getType(), b
+						.getAttribute().getScale());
+			}
+		}
     }
 
     /**
@@ -112,35 +109,62 @@ public class BatchAction extends BaseSQLAction {
         DbAdapter adapter = dataNode.getAdapter();
         PreparedStatement statement = con.prepareStatement(sql);
         try {
-            for (BatchQueryRow row : query.getRows()) {
+	        int count = 0;
+	        for (BatchQueryRow row : query.getRows()) {
 
-                ParameterBinding[] bindings = translator.updateBindings(row);
-                logger.logQueryParameters("batch bind", bindings);
-                bind(adapter, statement, bindings);
+		        ParameterBinding[] bindings = translator.updateBindings(row);
+		        logger.logQueryParameters("batch bind", bindings);
+		        bind(adapter, statement, bindings);
 
-                statement.addBatch();
-            }
+		        statement.addBatch();
 
-            // execute the whole batch
-            int[] results = statement.executeBatch();
-            delegate.nextBatchCount(query, results);
+		        if ((++count % MAX_BATCH_SIZE) == 0) {
+			        // execute the whole batch
+			        int[] results = statement.executeBatch();
+			        delegate.nextBatchCount(query, results);
 
-            if (isLoggable) {
-                int totalUpdateCount = 0;
-                for (int result : results) {
+			        if (isLoggable) {
+				        int totalUpdateCount = 0;
+				        for (int result : results) {
 
-                    // this means Statement.SUCCESS_NO_INFO or
-                    // Statement.EXECUTE_FAILED
-                    if (result < 0) {
-                        totalUpdateCount = Statement.SUCCESS_NO_INFO;
-                        break;
-                    }
+					        // this means Statement.SUCCESS_NO_INFO or
+					        // Statement.EXECUTE_FAILED
+					        if (result < 0) {
+						        totalUpdateCount = Statement.SUCCESS_NO_INFO;
+						        break;
+					        }
 
-                    totalUpdateCount += result;
-                }
+					        totalUpdateCount += result;
+				        }
 
-                logger.logUpdateCount(totalUpdateCount);
-            }
+				        logger.logUpdateCount(totalUpdateCount);
+			        }
+		        }
+	        }
+
+	        if ((count % MAX_BATCH_SIZE) > 0) {
+		        // execute the whole batch
+		        int[] results = statement.executeBatch();
+		        delegate.nextBatchCount(query, results);
+
+		        if (isLoggable) {
+			        int totalUpdateCount = 0;
+			        for (int result : results) {
+
+				        // this means Statement.SUCCESS_NO_INFO or
+				        // Statement.EXECUTE_FAILED
+				        if (result < 0) {
+					        totalUpdateCount = Statement.SUCCESS_NO_INFO;
+					        break;
+				        }
+
+				        totalUpdateCount += result;
+			        }
+
+			        logger.logUpdateCount(totalUpdateCount);
+		        }
+	        }
+
         } finally {
             try {
                 statement.close();
@@ -223,7 +247,7 @@ public class BatchAction extends BaseSQLAction {
 
     /**
      * Implements generated keys extraction supported in JDBC 3.0 specification.
-     * 
+     *
      * @since 4.0
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
