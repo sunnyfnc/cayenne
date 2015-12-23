@@ -51,7 +51,7 @@ public class BatchAction extends BaseSQLAction {
 	private static final int MAX_BATCH_SIZE = 1000;
 
 	private static void bind(DbAdapter adapter, PreparedStatement statement, ParameterBinding[] bindings)
-			throws SQLException, Exception {
+			throws Exception {
 
 		for (ParameterBinding b : bindings) {
 			if (!b.isExcluded()) {
@@ -78,7 +78,7 @@ public class BatchAction extends BaseSQLAction {
     }
 
     @Override
-    public void performAction(Connection connection, OperationObserver observer) throws SQLException, Exception {
+    public void performAction(Connection connection, OperationObserver observer) throws Exception {
 
         BatchTranslator translator = createTranslator();
         boolean generatesKeys = hasGeneratedKeys();
@@ -95,11 +95,11 @@ public class BatchAction extends BaseSQLAction {
     }
 
     protected void runAsBatch(Connection con, BatchTranslator translator, OperationObserver delegate)
-            throws SQLException, Exception {
+		    throws Exception {
 
-        String sql = translator.getSql();
-        JdbcEventLogger logger = dataNode.getJdbcEventLogger();
-        boolean isLoggable = logger.isLoggable();
+	    final String sql = translator.getSql();
+	    final JdbcEventLogger logger = dataNode.getJdbcEventLogger();
+	    boolean isLoggable = logger.isLoggable();
 
         // log batch SQL execution
         logger.logQuery(sql, Collections.EMPTY_LIST);
@@ -108,11 +108,12 @@ public class BatchAction extends BaseSQLAction {
 
         DbAdapter adapter = dataNode.getAdapter();
         PreparedStatement statement = con.prepareStatement(sql);
-        try {
+	    ParameterBinding[] bindings = new ParameterBinding[0];
+	    try {
 	        int count = 0;
 	        for (BatchQueryRow row : query.getRows()) {
 
-		        ParameterBinding[] bindings = translator.updateBindings(row);
+		        bindings = translator.updateBindings(row);
 		        logger.logQueryParameters("batch bind", bindings);
 		        bind(adapter, statement, bindings);
 
@@ -165,10 +166,14 @@ public class BatchAction extends BaseSQLAction {
 		        }
 	        }
 
-        } finally {
+	    } catch (SQLException ex) {
+		    logger.logQueryError(sql, bindings);
+		    throw ex;
+	    } finally {
             try {
                 statement.close();
             } catch (Exception e) {
+	            // ignore
             }
         }
     }
@@ -177,12 +182,12 @@ public class BatchAction extends BaseSQLAction {
      * Executes batch as individual queries over the same prepared statement.
      */
     protected void runAsIndividualQueries(Connection connection, BatchTranslator translator,
-            OperationObserver delegate, boolean generatesKeys) throws SQLException, Exception {
+                                          OperationObserver delegate, boolean generatesKeys) throws Exception {
 
         JdbcEventLogger logger = dataNode.getJdbcEventLogger();
         boolean useOptimisticLock = query.isUsingOptimisticLocking();
 
-        String queryStr = translator.getSql();
+	    final String queryStr = translator.getSql();
 
         // log batch SQL execution
         logger.logQuery(queryStr, Collections.EMPTY_LIST);
@@ -192,11 +197,12 @@ public class BatchAction extends BaseSQLAction {
         DbAdapter adapter = dataNode.getAdapter();
         PreparedStatement statement = (generatesKeys) ? connection.prepareStatement(queryStr,
                 Statement.RETURN_GENERATED_KEYS) : connection.prepareStatement(queryStr);
-        try {
-            for (BatchQueryRow row : query.getRows()) {
+	    ParameterBinding[] bindings = new ParameterBinding[0];
+	    try {
+		    for (BatchQueryRow row : query.getRows()) {
 
-                ParameterBinding[] bindings = translator.updateBindings(row);
-                logger.logQueryParameters("bind", bindings);
+			    bindings = translator.updateBindings(row);
+			    logger.logQueryParameters("bind", bindings);
 
                 bind(adapter, statement, bindings);
 
@@ -214,10 +220,14 @@ public class BatchAction extends BaseSQLAction {
 
                 logger.logUpdateCount(updated);
             }
-        } finally {
+	    } catch (SQLException ex) {
+		    logger.logQueryError(queryStr, bindings);
+		    throw ex;
+	    } finally {
             try {
                 statement.close();
             } catch (Exception e) {
+	            // ignore
             }
         }
     }

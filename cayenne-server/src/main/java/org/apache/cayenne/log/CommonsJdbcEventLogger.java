@@ -18,11 +18,6 @@
  ****************************************************************/
 package org.apache.cayenne.log;
 
-import java.lang.reflect.Array;
-import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.ExtendedEnumeration;
 import org.apache.cayenne.access.jdbc.SQLParameterBinding;
@@ -36,6 +31,11 @@ import org.apache.cayenne.util.IDUtil;
 import org.apache.cayenne.util.Util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.lang.reflect.Array;
+import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * A {@link JdbcEventLogger} built on top of commons-logging.
@@ -233,6 +233,16 @@ public class CommonsJdbcEventLogger implements JdbcEventLogger {
 	@Override
 	public void logQuery(String queryStr, List<?> params) {
 		logQuery(queryStr, null, params, -1);
+	}
+
+	@Override
+	public void logQueryError(String sql, ParameterBinding[] bindings) {
+		StringBuilder buffer = new StringBuilder(sql).append(" ");
+		appendParameters(buffer, "bind", bindings);
+
+		if (buffer.length() > 0) {
+			logger.error(buffer.toString());
+		}
 	}
 
 	/**

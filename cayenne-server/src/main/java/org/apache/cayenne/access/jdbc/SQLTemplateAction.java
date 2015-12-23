@@ -19,25 +19,13 @@
 
 package org.apache.cayenne.access.jdbc;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.cayenne.CayenneException;
 import org.apache.cayenne.DataRow;
 import org.apache.cayenne.ResultIterator;
 import org.apache.cayenne.access.DataNode;
 import org.apache.cayenne.access.OperationObserver;
 import org.apache.cayenne.access.jdbc.reader.RowReader;
+import org.apache.cayenne.access.translator.ParameterBinding;
 import org.apache.cayenne.access.types.ExtendedTypeMap;
 import org.apache.cayenne.dba.DbAdapter;
 import org.apache.cayenne.dba.TypesMapping;
@@ -51,6 +39,9 @@ import org.apache.cayenne.query.SQLTemplate;
 import org.apache.cayenne.util.Util;
 import org.apache.commons.collections.IteratorUtils;
 
+import java.sql.*;
+import java.util.*;
+
 /**
  * Implements a strategy for execution of SQLTemplates.
  * 
@@ -58,12 +49,12 @@ import org.apache.commons.collections.IteratorUtils;
  */
 public class SQLTemplateAction implements SQLAction {
 
-	protected SQLTemplate query;
-	protected QueryMetadata queryMetadata;
+	protected final SQLTemplate query;
+	protected final QueryMetadata queryMetadata;
 
-	protected DbEntity dbEntity;
-	protected DataNode dataNode;
-	protected DbAdapter dbAdapter;
+	protected final DbEntity dbEntity;
+	protected final DataNode dataNode;
+	protected final DbAdapter dbAdapter;
 
 	/**
 	 * @since 4.0
@@ -91,7 +82,7 @@ public class SQLTemplateAction implements SQLAction {
 	 * ResultSet is encountered.
 	 */
 	@Override
-	public void performAction(Connection connection, OperationObserver callback) throws SQLException, Exception {
+	public void performAction(Connection connection, OperationObserver callback) throws Exception {
 
 		String template = extractTemplateString();
 
@@ -166,7 +157,7 @@ public class SQLTemplateAction implements SQLAction {
 	}
 
 	protected void execute(Connection connection, OperationObserver callback, SQLStatement compiled,
-			Collection<Number> updateCounts) throws SQLException, Exception {
+	                       Collection<Number> updateCounts) throws Exception {
 
 		long t1 = System.currentTimeMillis();
 		boolean iteratedResult = callback.isIteratedResult();
@@ -212,10 +203,13 @@ public class SQLTemplateAction implements SQLAction {
 						break;
 					}
 
-					updateCounts.add(Integer.valueOf(updateCount));
+					updateCounts.add(updateCount);
 					dataNode.getJdbcEventLogger().logUpdateCount(updateCount);
 				}
 			}
+		} catch (SQLException ex) {
+			dataNode.getJdbcEventLogger().logQueryError(compiled.getSql(), new ParameterBinding[0]);
+			throw ex;
 		} finally {
 			if (!iteratedResult) {
 				statement.close();
@@ -233,9 +227,7 @@ public class SQLTemplateAction implements SQLAction {
 		RowDescriptorBuilder builder = configureRowDescriptorBuilder(compiled, resultSet);
 		RowReader<?> rowReader = dataNode.rowReader(builder.getDescriptor(types), queryMetadata);
 
-		JDBCResultIterator result = new JDBCResultIterator(statement, resultSet, rowReader);
-
-		ResultIterator it = result;
+		ResultIterator it = new JDBCResultIterator(statement, resultSet, rowReader);
 
 		if (iteratedResult) {
 
@@ -343,8 +335,7 @@ public class SQLTemplateAction implements SQLAction {
 	/**
 	 * Binds parameters to the PreparedStatement.
 	 */
-	protected void bind(PreparedStatement preparedStatement, SQLParameterBinding[] bindings) throws SQLException,
-			Exception {
+	protected void bind(PreparedStatement preparedStatement, SQLParameterBinding[] bindings) throws Exception {
 		// bind parameters
 		if (bindings.length > 0) {
 			int len = bindings.length;

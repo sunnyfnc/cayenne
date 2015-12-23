@@ -18,11 +18,11 @@
  ****************************************************************/
 package org.apache.cayenne.log;
 
-import java.util.List;
-
 import org.apache.cayenne.access.translator.ParameterBinding;
 import org.apache.cayenne.conn.DataSourceInfo;
 import org.apache.cayenne.map.DbAttribute;
+
+import java.util.List;
 
 /**
  * @since 3.1
@@ -74,6 +74,10 @@ public class NoopJdbcEventLogger implements JdbcEventLogger {
 
 	@Override
 	public void logQuery(String sql, List<?> params) {
+	}
+
+	@Override
+	public void logQueryError(String sql, ParameterBinding[] bindings) {
 	}
 
 	@Deprecated

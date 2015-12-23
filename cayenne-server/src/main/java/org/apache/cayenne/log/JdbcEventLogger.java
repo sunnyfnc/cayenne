@@ -18,11 +18,11 @@
  ****************************************************************/
 package org.apache.cayenne.log;
 
-import java.util.List;
-
 import org.apache.cayenne.access.translator.ParameterBinding;
 import org.apache.cayenne.conn.DataSourceInfo;
 import org.apache.cayenne.map.DbAttribute;
+
+import java.util.List;
 
 /**
  * A logging service used by Cayenne to output database interactions.
@@ -81,6 +81,8 @@ public interface JdbcEventLogger {
 	 */
 	@Deprecated
 	void logQuery(String sql, List<?> params);
+
+	void logQueryError(String sql, ParameterBinding[] bindings);
 
 	/**
 	 * @deprecated since 4.0 use
