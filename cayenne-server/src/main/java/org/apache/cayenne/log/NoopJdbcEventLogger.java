@@ -77,7 +77,7 @@ public class NoopJdbcEventLogger implements JdbcEventLogger {
 	}
 
 	@Override
-	public void logQueryError(String sql, ParameterBinding[] bindings) {
+	public void logQueryError(String sql, ParameterBinding[] bindings, Throwable t) {
 	}
 
 	@Deprecated

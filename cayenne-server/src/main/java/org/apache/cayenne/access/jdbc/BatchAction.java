@@ -167,7 +167,7 @@ public class BatchAction extends BaseSQLAction {
 	        }
 
 	    } catch (SQLException ex) {
-		    logger.logQueryError(sql, bindings);
+		    logger.logQueryError(sql, bindings, ex);
 		    throw ex;
 	    } finally {
             try {
@@ -221,7 +221,7 @@ public class BatchAction extends BaseSQLAction {
                 logger.logUpdateCount(updated);
             }
 	    } catch (SQLException ex) {
-		    logger.logQueryError(queryStr, bindings);
+		    logger.logQueryError(queryStr, bindings, ex);
 		    throw ex;
 	    } finally {
             try {

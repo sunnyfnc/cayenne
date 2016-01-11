@@ -82,7 +82,7 @@ public interface JdbcEventLogger {
 	@Deprecated
 	void logQuery(String sql, List<?> params);
 
-	void logQueryError(String sql, ParameterBinding[] bindings);
+	void logQueryError(String sql, ParameterBinding[] bindings, Throwable t);
 
 	/**
 	 * @deprecated since 4.0 use

@@ -208,7 +208,7 @@ public class SQLTemplateAction implements SQLAction {
 				}
 			}
 		} catch (SQLException ex) {
-			dataNode.getJdbcEventLogger().logQueryError(compiled.getSql(), new ParameterBinding[0]);
+			dataNode.getJdbcEventLogger().logQueryError(compiled.getSql(), new ParameterBinding[0], ex);
 			throw ex;
 		} finally {
 			if (!iteratedResult) {

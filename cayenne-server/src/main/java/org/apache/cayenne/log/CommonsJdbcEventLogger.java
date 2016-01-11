@@ -236,12 +236,12 @@ public class CommonsJdbcEventLogger implements JdbcEventLogger {
 	}
 
 	@Override
-	public void logQueryError(String sql, ParameterBinding[] bindings) {
+	public void logQueryError(String sql, ParameterBinding[] bindings, Throwable t) {
 		StringBuilder buffer = new StringBuilder(sql).append(" ");
 		appendParameters(buffer, "bind", bindings);
 
 		if (buffer.length() > 0) {
-			logger.error(buffer.toString());
+			logger.error(buffer.toString(), t);
 		}
 	}
 
