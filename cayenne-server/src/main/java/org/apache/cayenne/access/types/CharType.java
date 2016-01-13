@@ -82,7 +82,7 @@ public class CharType implements ExtendedType {
         return handleString(cs.getString(index), type);
     }
 
-    private Object handleString(String val, int type) throws SQLException {
+    protected Object handleString(String val, int type) throws SQLException {
         // trim CHAR type
         if (val != null && (type == Types.CHAR || type == Types.NCHAR) && isTrimmingChars()) {
             return rtrim(val);

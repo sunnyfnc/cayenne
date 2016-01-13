@@ -20,6 +20,7 @@ package org.apache.cayenne.dba.oracle;
 
 import java.sql.Clob;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Types;
 
 import org.apache.cayenne.access.types.CharType;
@@ -65,4 +66,15 @@ public class OracleCharType extends CharType {
             st.setObject(pos, val);
         }
     }
+
+	@Override
+	protected Object handleString(String val, int type) throws SQLException {
+		// trim CHAR type
+		if (val != null && (type == Types.CHAR || type == Types.NCHAR) && isTrimmingChars()) {
+			final String trimRes = rtrim(val);
+			return trimRes.isEmpty() ? " " : trimRes;
+		}
+
+		return val;
+	}
 }
