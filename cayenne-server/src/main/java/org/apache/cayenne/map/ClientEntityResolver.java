@@ -28,7 +28,7 @@ import org.apache.cayenne.reflect.valueholder.ValueHolderDescriptorFactory;
  * 
  * @since 3.0
  */
-class ClientEntityResolver extends EntityResolver {
+public class ClientEntityResolver extends EntityResolver {
 
     ClientEntityResolver() {
     }
