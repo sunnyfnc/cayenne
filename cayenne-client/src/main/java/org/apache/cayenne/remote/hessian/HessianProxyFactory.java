@@ -52,10 +52,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.WeakHashMap;
+import java.util.*;
 import java.util.logging.Level;
 
 /**
@@ -196,7 +193,9 @@ class HessianProxyFactory extends com.caucho.hessian.client.HessianProxyFactory 
 						// ignore
 					}
 
-					if (code != 200) {
+					if (code == 412) {
+						throw new NoSuchElementException("Binary not found");
+					} else if (code != 200) {
 						final StringBuilder sb = new StringBuilder();
 						int ch;
 

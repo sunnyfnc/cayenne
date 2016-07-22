@@ -36,7 +36,7 @@ Broken PostgreSQL types mapping.
        <db-type name="boolean"/>
    </jdbc-type>
    <jdbc-type name="BLOB">
-       <db-type name="oid"/>
+       <db-type name="bytea"/>
    </jdbc-type>
    <jdbc-type name="BOOLEAN">
        <db-type name="boolean"/>
