@@ -233,6 +233,9 @@ public class PostgresAdapter extends JdbcAdapter {
 				}
 			}
 		}
+		if (type == Types.DOUBLE) {
+			return false;
+		}
 
 		return super.typeSupportsLength(type);
 	}
