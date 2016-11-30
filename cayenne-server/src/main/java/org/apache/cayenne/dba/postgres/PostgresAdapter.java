@@ -132,6 +132,10 @@ public class PostgresAdapter extends JdbcAdapter {
 	@Override
 	public void bindParameter(PreparedStatement statement, Object object, int pos, int sqlType, int scale)
 			throws SQLException, Exception {
+		if (object == null && sqlType == Types.BLOB) {
+			statement.setBytes(pos, null);
+			return;
+		}
 		super.bindParameter(statement, object, pos, mapNTypes(sqlType), scale);
 	}
 
