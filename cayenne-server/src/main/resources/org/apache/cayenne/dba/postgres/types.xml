@@ -95,7 +95,7 @@ Broken PostgreSQL types mapping.
        <db-type name="time"/>
    </jdbc-type>
    <jdbc-type name="TIMESTAMP">
-       <db-type name="timestamp with time zone"/>
+       <db-type name="timestamp"/>
    </jdbc-type>
    <jdbc-type name="TINYINT">
        <db-type name="smallint"/>
